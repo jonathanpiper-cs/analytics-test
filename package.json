@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nivo/bar": "^0.99.0",
     "@nivo/pie": "^0.98.0",
     "agent-base": "^7.1.3",
     "events": "^3.3.0",
