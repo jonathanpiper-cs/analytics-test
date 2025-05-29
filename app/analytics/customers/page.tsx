@@ -4,9 +4,9 @@ import { hexToHSL, LABELS, NivoTheme } from '@/lib/utils';
 import { ResponsiveBar } from '@nivo/bar';
 import { NextResponse } from 'next/server';
 
-export async function getUseCasesByAuthor() {
+export async function getUseCasesByCustomer() {
 	try {
-		const res = await fetch('http://localhost:3000/api/authors/all', {method: 'GET'});
+		const res = await fetch('http://localhost:3000/api/customers/all', {method: 'GET'});
 		const data = await res.json();
 		return data;
 	} catch (error) {
@@ -16,9 +16,9 @@ export async function getUseCasesByAuthor() {
 }
 
 type ByCategory = Record<string, number>;
-type AuthorData = {
-	author: string;
-		cases: UseCase[];
+type CustomerData = {
+	customer_name: string;
+	cases: UseCase[];
 	byCategory: ByCategory;
 };
 type UseCase = {
@@ -33,19 +33,19 @@ type UseCase = {
 		edituiv2: string;
 	};
 }
-type UseCasesByAuthorResponse = {
+type UseCasesByCustomerResponse = {
 	useCases: UseCase[];
 	success: boolean;
 	data: {
-		analysis: AuthorData[];
+		analysis: CustomerData[];
 	} | null;
 };
 
 export default function Page() {
-	const [data, setData] = useState<UseCasesByAuthorResponse>({ success: false, data: null, useCases: [] });
+	const [data, setData] = useState<UseCasesByCustomerResponse>({ success: false, data: null, useCases: [] });
 	useEffect(() => {
 		const fetchData = async () => {
-		const data = await getUseCasesByAuthor();
+		const data = await getUseCasesByCustomer();
 		setData(data);
 	};
 	fetchData()
@@ -53,13 +53,13 @@ export default function Page() {
 
 	useEffect(() => {
 		console.log(
-			data?.data?.analysis.map((author) => ({
-				"author": author.author,
+			data?.data?.analysis.map((customer) => ({
+				"customer": customer.customer_name,
 				...Object.fromEntries(
-					Object.keys(author.byCategory).flatMap((category) => [
+					Object.keys(customer.byCategory).flatMap((category) => [
 						[
 							category,
-							author.byCategory[category]
+							customer.byCategory[category]
 						],
 						[
 							`${category}Color`,
@@ -84,13 +84,13 @@ export default function Page() {
 				<ResponsiveBar
 					// data={dummyData}
 						theme={NivoTheme}
-					data={data.data.analysis.map((author) => ({
-					"Author Name": author.author,
+					data={data.data.analysis.map((customer) => ({
+					"Customer Name": customer.customer_name || "No customer name provided",
 					...Object.fromEntries(
-					Object.keys(author.byCategory).flatMap((category) => [
+					Object.keys(customer.byCategory).flatMap((category) => [
 					[
 					category,
-					author.byCategory[category]
+					customer.byCategory[category]
 					],
 					[
 					`${category}Color`,
@@ -98,7 +98,7 @@ export default function Page() {
 					]
 					])
 					)}))}
-					indexBy="Author Name"
+					indexBy="Customer Name"
 					keys={[
 					'accepted',
 					'included',
@@ -131,11 +131,11 @@ export default function Page() {
 			/>
 			</div>
 				<div className="place-self-start ">
-					{data?.data.analysis?.map((author, authorIdx) => (
-						<div key={authorIdx} className="mb-8">
-							<h1 className="text-xl font-bold mb-2">{author.author}</h1>
-							{author.cases.map((useCase, caseIdx) => (
-								<div key={`${authorIdx}-${caseIdx}`}>
+					{data?.data.analysis?.map((customer, customerIdx) => (
+						<div key={customerIdx} className="mb-8">
+							<h1 className="text-xl font-bold mb-2">{customer.customer_name || "No customer name provided"}</h1>
+							{customer.cases.map((useCase, caseIdx) => (
+								<div key={`${customerIdx}-${caseIdx}`}>
 									<h2>{useCase.title}</h2>
 								</div>
 							))}

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAllUseCases, fetchUseCaseDetails } from '@/lib/confluence';
-import { groupAndAnalyzeUseCasesByAuthor } from '@/lib/analyze';
+import { groupAndAnalyzeUseCasesByCustomer } from '@/lib/analyze';
 
 export async function GET() {
   try {
@@ -10,7 +10,7 @@ export async function GET() {
     );
 
     const flatCases = detailedUseCases.flat();
-    const analysis = groupAndAnalyzeUseCasesByAuthor(flatCases);
+    const analysis = groupAndAnalyzeUseCasesByCustomer(flatCases);
 
     return NextResponse.json({ success: true, data: analysis, useCases: flatCases }, { status: 200 });
   } catch (error) {
