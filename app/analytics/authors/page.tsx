@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import { hexToHSL, LABELS, NivoTheme } from '@/lib/utils';
 import { ResponsiveBar } from '@nivo/bar';
 import { NextResponse } from 'next/server';
+import type { UseCasesByAuthorResponse } from '@/types';
 
 export async function getUseCasesByAuthor() {
 	try {
@@ -15,70 +16,28 @@ export async function getUseCasesByAuthor() {
 	}
 }
 
-type ByCategory = Record<string, number>;
-type AuthorData = {
-	author: string;
-		cases: UseCase[];
-	byCategory: ByCategory;
-};
-type UseCase = {
-	title: string;
-	space: string;
-	checkboxes: string[];
-	number_in_parent: number;
-	author_name: string;
-	customer_name: string;
-	date: string;
-	_links: {
-		edituiv2: string;
-	};
-}
-type UseCasesByAuthorResponse = {
-	useCases: UseCase[];
-	success: boolean;
-	data: {
-		analysis: AuthorData[];
-	} | null;
-};
-
 export default function Page() {
+
 	const [data, setData] = useState<UseCasesByAuthorResponse>({ success: false, data: null, useCases: [] });
+		const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		const fetchData = async () => {
 		const data = await getUseCasesByAuthor();
 		setData(data);
+			setLoading(false)
 	};
 	fetchData()
 	}, []);
 
-	useEffect(() => {
-		console.log(
-			data?.data?.analysis.map((author) => ({
-				"author": author.author,
-				...Object.fromEntries(
-					Object.keys(author.byCategory).flatMap((category) => [
-						[
-							category,
-							author.byCategory[category]
-						],
-						[
-							`${category}Color`,
-							`${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`
-						]
-					])
-				)
-			}))
-		);
-	}, [data]);
-
-	if (!data.data) {
-		return <div>Loading...</div>;
-	} else if (!data.success) {
-		return <div>Error fetching use cases</div>;
-	}
-
 	return (
 		<div className="flex flex-col place-self-center w-[90%] m-8">
+		{(loading) ? (
+			<div><p className="text-2xl font-bold">🤔 Loading...</p></div>
+		) : (
+            (!data.data) ? (
+            <div><p className="text-2xl font-bold">🤔 No data found</p></div>
+            ) : (
+			<>
 			<h1 className="text-4xl font-bold place-self-start">Use Cases by Author</h1>
 			<div className="w-full min-h-[400px] max-h-[1000px] h-dvh -mt-8">
 				<ResponsiveBar
@@ -104,7 +63,7 @@ export default function Page() {
 					'included',
 					'inReview',
 					'rejected',
-                    'unprocessed'
+						'unprocessed'
 					]}
 						// indexBy="country"
 						// keys={['hot dogs']}
@@ -126,7 +85,7 @@ export default function Page() {
 				data,
 		}: { id: string | number; data: Record<string, string | number> }) => String(data[`${id}Color`])}
 			layout="horizontal"
-            animate={false}
+				animate={false}
 
 			/>
 			</div>
@@ -142,6 +101,8 @@ export default function Page() {
 						</div>
 					))}
 				</div>
+</>
+	))}
 		</div>
 	);
 }

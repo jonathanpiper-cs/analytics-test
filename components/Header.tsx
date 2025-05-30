@@ -4,8 +4,8 @@ export function Header () {
 
 	return (
 		<header className="bg-gray-800 text-white p-4">
-			<h1 className="text-2xl font-bold">IAB Use Case Analytics</h1>
-			<p className="text-sm">Explore use cases categorized by</p>
+			<h1 className="text-4xl font-bold">IAB Use Case Analytics</h1>
+			<p className="text-lg">Explore use cases categorized by <a href="/analytics/authors" className="font-bold">Author</a> | <a href="/analytics/customers" className="font-bold">Customer</a> | <a href="/analytics/spaces" className="font-bold">Confluence Space</a></p>
 		</header>
 	);
 }

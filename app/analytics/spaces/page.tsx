@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { NextResponse } from 'next/server';
 import { LABELS, NivoTheme } from '@/lib/utils';
+import type { UseCasesBySpaceResponse } from '@/types';
 
 export async function getUseCasesBySpace() {
 	try {
@@ -16,51 +17,27 @@ export async function getUseCasesBySpace() {
 	}
 }
 
-type ByCategory = Record<string, number>;
-type SpaceData = {
-	space: string;
-	byCategory: ByCategory;
-		cases: UseCase[];
-};
-type UseCase = {
-	title: string;
-	space: string;
-	checkboxes: string[];
-	number_in_parent: number;
-	author_name: string;
-	customer_name: string;
-	date: string;
-	_links: {
-		edituiv2: string;
-	};
-}
-type UseCasesBySpaceResponse = {
-	useCases: UseCase[];
-	success: boolean;
-	data: {
-		analysis: SpaceData[];
-	} | null;
-};
-
 export default function Page() {
 	const [data, setData] = useState<UseCasesBySpaceResponse>({ success: false, data: null, useCases: [] });
+		const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		const fetchData = async () => {
 		const data = await getUseCasesBySpace();
 		setData(data);
+			setLoading(false);
 	};
 	fetchData()
 	}, []);
-
-	if (!data.data) {
-	return <div>Loading...</div>;
-		}
-		else if (!data.success) {
-			return <div>Error fetching use cases</div>;
-	}
-
+    
 	return (
 		<div className="flex flex-col place-self-center w-[90%] m-8">
+			{(loading) ? (
+			<div><p className="text-2xl font-bold">🤔 Loading...</p></div>
+		) : (
+			(!data.data) ? (
+			<div><p className="text-2xl font-bold">🤔 No data found</p></div>
+			) : (
+			<>
 			<h1 className="text-4xl font-bold">Use Cases by Space</h1>
 				<div className="grid grid-cols-3 gap-4">
 				{data?.data?.analysis?.map((space, index) => (
@@ -74,7 +51,7 @@ export default function Page() {
 									value: space.byCategory[category],
 										color: LABELS[category as keyof typeof LABELS].color
 									}))}
-                                theme={NivoTheme}
+										theme={NivoTheme}
 								margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
 									colors={{ datum: 'data.color' }}
 								innerRadius={0.5}
@@ -113,6 +90,8 @@ export default function Page() {
 		</div>
 	))}
 	</div>
+		</>
+			))}
 	</div>
 	);
 }

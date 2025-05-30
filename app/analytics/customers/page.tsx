@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import { hexToHSL, LABELS, NivoTheme } from '@/lib/utils';
 import { ResponsiveBar } from '@nivo/bar';
 import { NextResponse } from 'next/server';
+import type { UseCasesByCustomerResponse } from '@/types';
 
 export async function getUseCasesByCustomer() {
 	try {
@@ -15,74 +16,50 @@ export async function getUseCasesByCustomer() {
 	}
 }
 
-type ByCategory = Record<string, number>;
-type CustomerData = {
-	customer_name: string;
-	cases: UseCase[];
-	byCategory: ByCategory;
-};
-type UseCase = {
-	title: string;
-	space: string;
-	checkboxes: string[];
-	number_in_parent: number;
-	author_name: string;
-	customer_name: string;
-	date: string;
-	_links: {
-		edituiv2: string;
-	};
-}
-type UseCasesByCustomerResponse = {
-	useCases: UseCase[];
-	success: boolean;
-	data: {
-		analysis: CustomerData[];
-	} | null;
-};
-
 export default function Page() {
 	const [data, setData] = useState<UseCasesByCustomerResponse>({ success: false, data: null, useCases: [] });
+    const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		const fetchData = async () => {
 		const data = await getUseCasesByCustomer();
 		setData(data);
+        setLoading(false)
 	};
 	fetchData()
 	}, []);
 
-	useEffect(() => {
-		console.log(
-			data?.data?.analysis.map((customer) => ({
-				"customer": customer.customer_name,
-				...Object.fromEntries(
-					Object.keys(customer.byCategory).flatMap((category) => [
-						[
-							category,
-							customer.byCategory[category]
-						],
-						[
-							`${category}Color`,
-							`${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`
-						]
-					])
-				)
-			}))
-		);
-	}, [data]);
-
-	if (!data.data) {
-		return <div>Loading...</div>;
-	} else if (!data.success) {
-		return <div>Error fetching use cases</div>;
-	}
+	// useEffect(() => {
+	// 	console.log(
+	// 		data?.data?.analysis.map((customer) => ({
+	// 			"customer": customer.customer_name,
+	// 			...Object.fromEntries(
+	// 				Object.keys(customer.byCategory).flatMap((category) => [
+	// 					[
+	// 						category,
+	// 						customer.byCategory[category]
+	// 					],
+	// 					[
+	// 						`${category}Color`,
+	// 						`${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`
+	// 					]
+	// 				])
+	// 			)
+	// 		}))
+	// 	);
+	// }, [data]);
 
 	return (
 		<div className="flex flex-col place-self-center w-[90%] m-8">
-			<h1 className="text-4xl font-bold place-self-start">Use Cases by Author</h1>
+		{(loading) ? (
+			<div><p className="text-2xl font-bold">🤔 Loading...</p></div>
+		) : (
+            (!data.data) ? (
+            <div><p className="text-2xl font-bold">🤔 No data found</p></div>
+            ) : (
+			<>
+			<h1 className="text-4xl font-bold place-self-start">Use Cases by Customer</h1>
 			<div className="w-full min-h-[400px] max-h-[1000px] h-dvh -mt-8">
 				<ResponsiveBar
-					// data={dummyData}
 						theme={NivoTheme}
 					data={data.data.analysis.map((customer) => ({
 					"Customer Name": customer.customer_name || "No customer name provided",
@@ -106,8 +83,6 @@ export default function Page() {
 					'rejected',
                     'unprocessed'
 					]}
-						// indexBy="country"
-						// keys={['hot dogs']}
 					labelSkipHeight={16}
 					labelSkipWidth={16}
 					labelTextColor="inherit:darker(1.4)"
@@ -117,9 +92,6 @@ export default function Page() {
 						right: 110,
 						top: 60
 					}}
-					onClick={() => {}}
-					onMouseEnter={() => {}}
-					onMouseLeave={() => {}}
 					padding={0.2}
 						colors={({
 				id,
@@ -142,6 +114,8 @@ export default function Page() {
 						</div>
 					))}
 				</div>
+                </>)
+                )}
 		</div>
 	);
 }
