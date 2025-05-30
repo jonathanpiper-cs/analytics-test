@@ -7,7 +7,7 @@ import type { UseCasesBySpaceResponse } from '@/types'
 
 async function getUseCasesBySpace() {
   try {
-    const res = await fetch('http://localhost:3000/api/spaces/all', {
+    const res = await fetch(`${process.env.SELF_HOST}/api/spaces/all`, {
       method: 'GET',
     })
     const data = await res.json()

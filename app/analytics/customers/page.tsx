@@ -7,7 +7,7 @@ import type { UseCasesByCustomerResponse } from '@/types'
 
 async function getUseCasesByCustomer() {
   try {
-    const res = await fetch('http://localhost:3000/api/customers/all', {
+    const res = await fetch(`${process.env.SELF_HOST}/api/customers/all`, {
       method: 'GET',
     })
     const data = await res.json()

@@ -7,7 +7,7 @@ import type { UseCasesByAuthorResponse } from '@/types'
 
 async function getUseCasesByAuthor() {
   try {
-    const res = await fetch('http://localhost:3000/api/authors/all', {
+    const res = await fetch(`${process.env.SELF_HOST}/api/authors/all`, {
       method: 'GET',
     })
     const data = await res.json()
