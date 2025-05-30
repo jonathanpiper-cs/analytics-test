@@ -5,8 +5,6 @@ import { ResponsiveBar } from '@nivo/bar'
 import { NextResponse } from 'next/server'
 import type { UseCasesByCustomerResponse } from '@/types'
 
-console.log(process.env.NEXT_PUBLIC_SELF_HOST)
-
 async function getUseCasesByCustomer() {
   try {
     const res = await fetch(
@@ -41,26 +39,6 @@ export default function Page() {
     }
     fetchData()
   }, [])
-
-  // useEffect(() => {
-  // 	console.log(
-  // 		data?.data?.analysis.map((customer) => ({
-  // 			"customer": customer.customer_name,
-  // 			...Object.fromEntries(
-  // 				Object.keys(customer.byCategory).flatMap((category) => [
-  // 					[
-  // 						category,
-  // 						customer.byCategory[category]
-  // 					],
-  // 					[
-  // 						`${category}Color`,
-  // 						`${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`
-  // 					]
-  // 				])
-  // 			)
-  // 		}))
-  // 	);
-  // }, [data]);
 
   return (
     <div className="m-8 flex w-[90%] flex-col place-self-center">

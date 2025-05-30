@@ -14,7 +14,6 @@ async function getUseCasesBySpace() {
       },
     )
     const data = await res.json()
-    console.log(data)
     return data
   } catch (error) {
     console.error(error)
@@ -61,13 +60,13 @@ export default function Page() {
                 <div className="h-96">
                   {
                     <ResponsivePie
+                      theme={NivoTheme}
                       data={Object.keys(space.byCategory).map((category) => ({
                         id: LABELS[category as keyof typeof LABELS].legend,
                         label: LABELS[category as keyof typeof LABELS].legend,
                         value: space.byCategory[category],
                         color: LABELS[category as keyof typeof LABELS].color,
                       }))}
-                      theme={NivoTheme}
                       margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
                       colors={{ datum: 'data.color' }}
                       innerRadius={0.5}
