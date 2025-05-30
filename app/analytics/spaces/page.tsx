@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { LABELS, NivoTheme } from '@/lib/utils';
 import type { UseCasesBySpaceResponse } from '@/types';
 
-export async function getUseCasesBySpace() {
+async function getUseCasesBySpace() {
 	try {
 		const res = await fetch('http://localhost:3000/api/spaces/all', {method: 'GET'});
 		const data = await res.json();

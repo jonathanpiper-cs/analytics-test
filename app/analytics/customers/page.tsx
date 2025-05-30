@@ -5,7 +5,7 @@ import { ResponsiveBar } from '@nivo/bar';
 import { NextResponse } from 'next/server';
 import type { UseCasesByCustomerResponse } from '@/types';
 
-export async function getUseCasesByCustomer() {
+async function getUseCasesByCustomer() {
 	try {
 		const res = await fetch('http://localhost:3000/api/customers/all', {method: 'GET'});
 		const data = await res.json();

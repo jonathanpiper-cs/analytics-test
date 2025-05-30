@@ -5,7 +5,7 @@ import { ResponsiveBar } from '@nivo/bar';
 import { NextResponse } from 'next/server';
 import type { UseCasesByAuthorResponse } from '@/types';
 
-export async function getUseCasesByAuthor() {
+async function getUseCasesByAuthor() {
 	try {
 		const res = await fetch('http://localhost:3000/api/authors/all', {method: 'GET'});
 		const data = await res.json();
