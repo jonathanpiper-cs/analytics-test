@@ -7,9 +7,12 @@ import type { UseCasesBySpaceResponse } from '@/types'
 
 async function getUseCasesBySpace() {
   try {
-    const res = await fetch(`${process.env.SELF_HOST}/api/spaces/all`, {
-      method: 'GET',
-    })
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SELF_HOST}/api/spaces/all`,
+      {
+        method: 'GET',
+      },
+    )
     const data = await res.json()
     console.log(data)
     return data

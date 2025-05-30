@@ -5,11 +5,16 @@ import { ResponsiveBar } from '@nivo/bar'
 import { NextResponse } from 'next/server'
 import type { UseCasesByCustomerResponse } from '@/types'
 
+console.log(process.env.SELF_HOST)
+
 async function getUseCasesByCustomer() {
   try {
-    const res = await fetch(`${process.env.SELF_HOST}/api/customers/all`, {
-      method: 'GET',
-    })
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SELF_HOST}/api/customers/all`,
+      {
+        method: 'GET',
+      },
+    )
     const data = await res.json()
     return data
   } catch (error) {

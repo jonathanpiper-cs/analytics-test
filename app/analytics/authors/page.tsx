@@ -7,9 +7,12 @@ import type { UseCasesByAuthorResponse } from '@/types'
 
 async function getUseCasesByAuthor() {
   try {
-    const res = await fetch(`${process.env.SELF_HOST}/api/authors/all`, {
-      method: 'GET',
-    })
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SELF_HOST}/api/authors/all`,
+      {
+        method: 'GET',
+      },
+    )
     const data = await res.json()
     return data
   } catch (error) {
