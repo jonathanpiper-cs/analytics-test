@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { ResponsivePie } from '@nivo/pie'
 import { NextResponse } from 'next/server'
-import { LABELS, NivoTheme } from '@/lib/utils'
+import { LABELS } from '@/lib/utils'
 import type { UseCasesBySpaceResponse } from '@/types'
 
 async function getUseCasesBySpace() {
@@ -60,7 +60,7 @@ export default function Page() {
                 <div className="h-96">
                   {
                     <ResponsivePie
-                      theme={NivoTheme}
+                      //   theme={NivoTheme}
                       data={Object.keys(space.byCategory).map((category) => ({
                         id: LABELS[category as keyof typeof LABELS].legend,
                         label: LABELS[category as keyof typeof LABELS].legend,
