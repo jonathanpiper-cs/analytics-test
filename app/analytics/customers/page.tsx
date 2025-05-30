@@ -5,7 +5,7 @@ import { ResponsiveBar } from '@nivo/bar'
 import { NextResponse } from 'next/server'
 import type { UseCasesByCustomerResponse } from '@/types'
 
-console.log(process.env.SELF_HOST)
+console.log(process.env.NEXT_PUBLIC_SELF_HOST)
 
 async function getUseCasesByCustomer() {
   try {
