@@ -92,6 +92,9 @@ export async function fetchUseCaseDetails(pageId: string) {
       date: date || '',
       checkboxes: extractCheckboxes(parsed),
       space: spaceName,
+      _links: {
+        edituiv2: raw._links.edituiv2,
+      },
     }
   })
 }

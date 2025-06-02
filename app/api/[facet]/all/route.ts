@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getAllUseCases, fetchUseCaseDetails } from '@/lib/confluence'
-import { groupAndAnalyzeUseCasesBySpace } from '@/lib/analyze'
+import { groupAndAnalyzeUseCasesByFacet } from '@/lib/analyze'
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ facet: string }> },
+) {
+  const { facet } = await params
   try {
     const rawUseCases = await getAllUseCases()
     const detailedUseCases = await Promise.all(
@@ -10,10 +14,10 @@ export async function GET() {
     )
 
     const flatCases = detailedUseCases.flat()
-    const analysis = groupAndAnalyzeUseCasesBySpace(flatCases)
+    const analysis = groupAndAnalyzeUseCasesByFacet(flatCases, facet)
 
     return NextResponse.json(
-      { success: true, data: analysis, useCases: flatCases },
+      { success: true, ...analysis, useCases: flatCases },
       { status: 200 },
     )
   } catch (error) {

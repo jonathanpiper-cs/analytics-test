@@ -1,12 +1,28 @@
-interface UseCase {
-  space: string
-  checkboxes: string[]
-  customer_name: string
-  author_name: string
-  number_in_parent: number
-  date: string
-  title: string
+import { NextResponse } from 'next/server'
+import { FACETS } from '@/lib/facets'
+import type { Facet, UseCase as OriginalUseCase } from '@/types'
+
+type UseCase = OriginalUseCase & {
   [key: string]: unknown
+}
+
+export async function getUseCasesByFacet(facet: string) {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SELF_HOST}/api/${facet}/all`,
+      {
+        method: 'GET',
+      },
+    )
+    const data = await res.json()
+    return { ...data, facet: FACETS[facet as keyof typeof FACETS] as Facet }
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch use cases' },
+      { status: 500 },
+    )
+  }
 }
 
 const explodeCheckboxes = (cases: UseCase[]) => {
@@ -26,83 +42,29 @@ const explodeCheckboxes = (cases: UseCase[]) => {
   }
 }
 
-export function groupAndAnalyzeUseCasesBySpace(useCases: UseCase[]) {
-  const bySpace: Record<string, UseCase[]> = {}
-
-  useCases.forEach((uc) => {
-    if (!bySpace[uc.space]) bySpace[uc.space] = []
-    bySpace[uc.space].push(uc)
-  })
-
-  const analysis = Object.entries(bySpace).map(([space, cases]) => {
-    const { accepted, included, inReview, rejected } = explodeCheckboxes(cases)
-
-    return {
-      space,
-      cases,
-      total: cases.length,
-      byCategory: {
-        unprocessed: cases.length - (accepted + included + inReview + rejected),
-        accepted,
-        included,
-        inReview,
-        rejected,
-      },
-      percentProcessed: Math.round(
-        ((accepted + included + inReview + rejected) / cases.length) * 100,
-      ),
-    }
-  })
-
-  return { analysis }
+function getFacetIndex(facet: string) {
+  const string = FACETS[facet as keyof typeof FACETS]?.index || ''
+  return string
 }
 
-export function groupAndAnalyzeUseCasesByCustomer(useCases: UseCase[]) {
-  const byCustomer: Record<string, UseCase[]> = {}
+export function groupAndAnalyzeUseCasesByFacet(
+  useCases: UseCase[],
+  facet: string,
+) {
+  const byFacet: Record<string, UseCase[]> = {}
+  console.log(facet)
 
   useCases.forEach((uc) => {
-    if (!byCustomer[uc.customer_name]) byCustomer[uc.customer_name] = []
-    byCustomer[uc.customer_name].push(uc)
+    const facetValue = uc[getFacetIndex(facet)] as string
+    if (!byFacet[facetValue]) byFacet[facetValue] = []
+    byFacet[facetValue].push(uc)
   })
 
-  const analysis = Object.entries(byCustomer).map(([customer_name, cases]) => {
+  const analysis = Object.entries(byFacet).map(([facetValue, cases]) => {
     const { accepted, included, inReview, rejected } = explodeCheckboxes(cases)
 
     return {
-      customer_name,
-      cases,
-      total: cases.length,
-      byCategory: {
-        unprocessed: cases.length - (accepted + included + inReview + rejected),
-        accepted,
-        included,
-        inReview,
-        rejected,
-      },
-      percentProcessed: Math.round(
-        ((accepted + included + inReview + rejected) / cases.length) * 100,
-      ),
-    }
-  })
-
-  return { analysis }
-}
-
-export function groupAndAnalyzeUseCasesByAuthor(useCases: UseCase[]) {
-  const byAuthor: Record<string, UseCase[]> = {}
-
-  useCases.forEach((uc) => {
-    if (!byAuthor[uc.author_name]) byAuthor[uc.author_name] = []
-    byAuthor[uc.author_name].push(uc)
-  })
-
-  console.log('byAuthor', byAuthor)
-
-  const analysis = Object.entries(byAuthor).map(([author, cases]) => {
-    const { accepted, included, inReview, rejected } = explodeCheckboxes(cases)
-
-    return {
-      author,
+      [getFacetIndex(facet)]: facetValue,
       cases,
       total: cases.length,
       byCategory: {
