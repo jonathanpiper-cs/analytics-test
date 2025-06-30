@@ -1,9 +1,5 @@
 export type ByCategory = Record<string, number>
-// export type SpaceData = {
-//   space: string
-//   byCategory: ByCategory
-//   cases: UseCase[]
-// }
+
 export type UseCase = {
   title: string
   space: string
@@ -16,13 +12,6 @@ export type UseCase = {
     edituiv2: string
   }
 }
-// export type UseCasesBySpaceResponse = {
-//   useCases: UseCase[]
-//   success: boolean
-//   data: {
-//     analysis: SpaceData[]
-//   } | null
-// }
 
 export type Facets = {
   authors: Facet
@@ -45,32 +34,4 @@ export type UseCasesByFacet = {
   useCases: UseCase[]
   success: boolean
   analysis: FacetData[]
-}
-
-// export type CustomerData = {
-//   customer_name: string
-//   cases: UseCase[]
-//   byCategory: ByCategory
-// }
-// export type UseCasesByCustomerResponse = {
-//   useCases: UseCase[]
-//   success: boolean
-//   data: {
-//     analysis: CustomerData[]
-//   } | null
-// }
-// export type AuthorData = {
-//   author: string
-//   cases: UseCase[]
-//   byCategory: ByCategory
-// }
-// export type UseCasesByAuthorResponse = {
-//   useCases: UseCase[]
-//   success: boolean
-//   data: {
-//     analysis: AuthorData[]
-//   } | null
-// }
-export type GraphDatum = {
-  [key: string]: string | number
 }

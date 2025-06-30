@@ -52,7 +52,6 @@ export function groupAndAnalyzeUseCasesByFacet(
   facet: string,
 ) {
   const byFacet: Record<string, UseCase[]> = {}
-  console.log(facet)
 
   useCases.forEach((uc) => {
     const facetValue = uc[getFacetIndex(facet)] as string
@@ -68,7 +67,11 @@ export function groupAndAnalyzeUseCasesByFacet(
       cases,
       total: cases.length,
       byCategory: {
-        unprocessed: cases.length - (accepted + included + inReview + rejected),
+        total: cases.length,
+        unprocessed: Math.max(
+          cases.length - (accepted + included + inReview + rejected),
+          0,
+        ),
         accepted,
         included,
         inReview,

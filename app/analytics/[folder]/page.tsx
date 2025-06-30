@@ -1,21 +1,18 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { hexToHSL, LABELS } from '@/lib/utils'
+import { hexToHSL, LABELS, sortGraphData } from '@/lib/utils'
 import NivoTheme from '@/lib/nivoTheme'
 import { ResponsiveBar } from '@nivo/bar'
-import type { UseCasesByFacet, FacetData, UseCase, GraphDatum } from '@/types'
+import type { UseCasesByFacet, FacetData, UseCase } from '@/types'
 import { getUseCasesByFacet } from '@/lib/analyze'
 import { FACETS } from '@/lib/facets'
 
 export default function Page() {
   const params = useParams()
   const facet = params.folder as string
-  console.log('Facet:', facet)
   const facetIndex = FACETS[facet as keyof typeof FACETS]?.index || ''
   const facetLabel = FACETS[facet as keyof typeof FACETS]?.label || ''
-  console.log('Facet Index:', facetIndex)
-  console.log('Facet Label:', facetLabel)
 
   const [data, setData] = useState<UseCasesByFacet>({
     facet: facet,
@@ -23,34 +20,51 @@ export default function Page() {
     analysis: [],
     useCases: [],
   })
+
   const [loading, setLoading] = useState(true)
-  const [graphData, setGraphData] = useState<GraphDatum[]>([])
+  const [graphData, setGraphData] = useState<Record<string, string | number>[]>(
+    [],
+  )
 
   useEffect(() => {
     if (!facet) return
     const fetchData = async () => {
       const data = await getUseCasesByFacet(facet)
       setData(data)
-      console.log(data)
-      const graph = data.analysis.map((facetInstance: FacetData) => ({
-        [facetLabel]: facetInstance[facetIndex as keyof typeof facetInstance],
-        ...Object.fromEntries(
-          Object.keys(facetInstance.byCategory).flatMap((category) => [
-            [category, facetInstance.byCategory[category]],
-            [
-              `${category}Color`,
-              `${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`,
-            ],
-          ]),
-        ),
-      }))
-      console.log(graph)
-      setGraphData(graph)
-      console.log('Fetched data:', data)
-      setLoading(false)
+      if (data) {
+        const graph = sortGraphData(
+          data.analysis.map((facetInstance: FacetData) => {
+            return {
+              [facetIndex]:
+                facetInstance[facetIndex as keyof typeof facetInstance] ||
+                'No data',
+              ...Object.fromEntries(
+                Object.keys(facetInstance.byCategory).flatMap((category) => [
+                  [category, facetInstance.byCategory[category]],
+                  [
+                    `${category}Color`,
+                    `${hexToHSL(LABELS[category as keyof typeof LABELS]?.color || '#000000')}`,
+                  ],
+                ]),
+              ),
+            }
+          }),
+          facetIndex,
+          'asc',
+        )
+
+        setGraphData(graph)
+        setLoading(false)
+      }
     }
     fetchData()
   }, [facet, facetLabel, facetIndex])
+
+  useEffect(() => {
+    if (graphData) {
+      console.log('data!', graphData)
+    }
+  }, [graphData])
 
   return (
     <div className="m-8 flex w-[90%] flex-col place-self-center">
@@ -70,11 +84,60 @@ export default function Page() {
               ? FACETS[facet as keyof typeof FACETS].label
               : facet}
           </h1>
-          <div className="-mt-8 h-dvh max-h-[1000px] min-h-[400px] w-full">
+          <div className="">
+            <p>Sort by:</p>
+            <div className="z-10 flex items-center justify-items-start gap-4">
+              <div className="flex items-center gap-2">
+                <p className="inline">{facetLabel}</p>
+                <button
+                  type="button"
+                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
+                  onClick={() => {
+                    setGraphData(sortGraphData(graphData, facetIndex, 'asc'))
+                  }}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
+                  onClick={() => {
+                    setGraphData(sortGraphData(graphData, facetIndex, 'desc'))
+                  }}
+                >
+                  ↓
+                </button>
+              </div>
+              <div>|</div>
+              <div className="flex items-center gap-2">
+                <p className="inline">Count</p>
+                <button
+                  type="button"
+                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
+                  onClick={() => {
+                    setGraphData(sortGraphData(graphData, 'total', 'asc'))
+                  }}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
+                  onClick={() => {
+                    setGraphData(sortGraphData(graphData, 'total', 'desc'))
+                  }}
+                >
+                  {' '}
+                  ↓
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="-pt-8 h-dvh max-h-[1000px] min-h-[400px] w-full">
             <ResponsiveBar
               theme={NivoTheme}
-              data={graphData}
-              indexBy={facetLabel}
+              data={graphData || []}
+              indexBy={facetIndex}
               keys={[
                 'accepted',
                 'included',

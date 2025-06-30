@@ -75,3 +75,24 @@ export const LABELS = {
   rejected: { legend: 'Rejected', color: '#fdd0ec' },
   unprocessed: { legend: 'Unprocessed', color: '#7d818a' },
 }
+
+export const sortGraphData = (
+  rawData: Record<string, string | number>[],
+  facet: string,
+  direction: 'asc' | 'desc' = 'asc',
+) => {
+  const data = [...rawData]
+  data.sort((a, b) => {
+    const aFacetValue = a[facet] as string
+    const bFacetValue = b[facet] as string
+    if (aFacetValue > bFacetValue) {
+      return direction === 'asc' ? -1 : 1
+    }
+    if (aFacetValue < bFacetValue) {
+      return direction === 'asc' ? 1 : -1
+    }
+    return 0
+  })
+  console.log('Sorted data:', data)
+  return data
+}
