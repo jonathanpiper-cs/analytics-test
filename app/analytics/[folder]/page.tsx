@@ -7,13 +7,24 @@ import { ResponsiveBar } from '@nivo/bar'
 import type { UseCasesByFacet, FacetData, UseCase } from '@/types'
 import { getUseCasesByFacet } from '@/lib/analyze'
 import { FACETS } from '@/lib/facets'
+import { SortingButtons } from '@/components/SortingButtons'
 
+/**
+ * Analytics Page Component
+ *
+ * This page displays use case analytics grouped by a dynamic facet (author, customer, or space).
+ * It fetches the relevant data, renders a horizontal bar chart (Nivo), and provides sorting controls.
+ * Below the chart, it lists all use cases for each facet value.
+ */
 export default function Page() {
+  // Get the dynamic route parameter (facet) from the URL
   const params = useParams()
   const facet = params.folder as string
+  // Get the property key and label for the current facet from the FACETS config
   const facetIndex = FACETS[facet as keyof typeof FACETS]?.index || ''
   const facetLabel = FACETS[facet as keyof typeof FACETS]?.label || ''
 
+  // State for the fetched analytics data
   const [data, setData] = useState<UseCasesByFacet>({
     facet: facet,
     success: false,
@@ -21,17 +32,25 @@ export default function Page() {
     useCases: [],
   })
 
+  // Loading state for async data fetching
   const [loading, setLoading] = useState(true)
+  // State for the graph data (used by Nivo bar chart)
   const [graphData, setGraphData] = useState<Record<string, string | number>[]>(
     [],
   )
 
+  /**
+   * Fetch analytics data for the current facet when the facet changes.
+   * The data is sorted by the facet index (e.g., author name) in ascending order by default.
+   * The graph data is prepared for the Nivo bar chart, including color mapping.
+   */
   useEffect(() => {
     if (!facet) return
     const fetchData = async () => {
       const data = await getUseCasesByFacet(facet)
       setData(data)
       if (data) {
+        // Prepare the graph data for the bar chart
         const graph = sortGraphData(
           data.analysis.map((facetInstance: FacetData) => {
             return {
@@ -60,79 +79,35 @@ export default function Page() {
     fetchData()
   }, [facet, facetLabel, facetIndex])
 
-  useEffect(() => {
-    if (graphData) {
-      console.log('data!', graphData)
-    }
-  }, [graphData])
-
   return (
     <div className="m-8 flex w-[90%] flex-col place-self-center">
+      {/* Show loading state while fetching data */}
       {loading ? (
         <div>
           <p className="text-2xl font-bold">🤔 Loading...</p>
         </div>
       ) : !data ? (
+        // Show a message if no data is found
         <div>
           <p className="text-2xl font-bold">🤔 No data found</p>
         </div>
       ) : (
         <>
+          {/* Page title with the current facet label */}
           <h1 className="place-self-start text-4xl font-bold">
             Use Cases by{' '}
             {facet in FACETS
               ? FACETS[facet as keyof typeof FACETS].label
               : facet}
           </h1>
-          <div className="">
-            <p>Sort by:</p>
-            <div className="z-10 flex items-center justify-items-start gap-4">
-              <div className="flex items-center gap-2">
-                <p className="inline">{facetLabel}</p>
-                <button
-                  type="button"
-                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
-                  onClick={() => {
-                    setGraphData(sortGraphData(graphData, facetIndex, 'asc'))
-                  }}
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
-                  onClick={() => {
-                    setGraphData(sortGraphData(graphData, facetIndex, 'desc'))
-                  }}
-                >
-                  ↓
-                </button>
-              </div>
-              <div>|</div>
-              <div className="flex items-center gap-2">
-                <p className="inline">Count</p>
-                <button
-                  type="button"
-                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
-                  onClick={() => {
-                    setGraphData(sortGraphData(graphData, 'total', 'asc'))
-                  }}
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
-                  onClick={() => {
-                    setGraphData(sortGraphData(graphData, 'total', 'desc'))
-                  }}
-                >
-                  {' '}
-                  ↓
-                </button>
-              </div>
-            </div>
-          </div>
+          {/* Sorting controls for the bar chart */}
+          <SortingButtons
+            facetLabel={facetLabel}
+            facetIndex={facetIndex}
+            graphData={graphData}
+            setGraphData={setGraphData}
+          />
+          {/* Horizontal bar chart visualization using Nivo */}
           <div className="-pt-8 h-dvh max-h-[1000px] min-h-[400px] w-full">
             <ResponsiveBar
               theme={NivoTheme}
@@ -158,6 +133,7 @@ export default function Page() {
               onMouseEnter={() => {}}
               onMouseLeave={() => {}}
               padding={0.2}
+              // Use the color for each bar from the graph data
               colors={({
                 id,
                 data,
@@ -169,6 +145,7 @@ export default function Page() {
               animate={false}
             />
           </div>
+          {/* List of all use cases for each facet value */}
           <div className="place-self-start">
             {data.analysis?.map((facetInstance, index) => (
               <div key={index} className="mb-8">

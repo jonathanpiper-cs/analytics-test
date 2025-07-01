@@ -3,6 +3,9 @@ export const headers = {
   Accept: 'application/json',
 }
 
+/**
+ * Authentication headers for API requests, using Basic Auth with credentials from environment variables.
+ */
 export const auth = {
   ...headers,
   Authorization:
@@ -12,6 +15,11 @@ export const auth = {
     ),
 }
 
+/**
+ * Fetches a label object from the API by its name.
+ * @param name - The name of the label to fetch.
+ * @returns The label object from the API.
+ */
 export async function getLabel(name: string) {
   const url = `${process.env.V1_BASE_URL!}label?name=${name}`
   const response = await fetch(url, { headers: auth })
@@ -19,6 +27,11 @@ export async function getLabel(name: string) {
   return data.label
 }
 
+/**
+ * Fetches the name of a Confluence space by its ID.
+ * @param id - The space ID.
+ * @returns The name of the space.
+ */
 export async function getSpace(id: string) {
   const url = `${process.env.BASE_URL!}spaces/${id}`
   const response = await fetch(url, { headers: auth })
@@ -26,6 +39,11 @@ export async function getSpace(id: string) {
   return data.name
 }
 
+/**
+ * Converts a hex color string to an HSL color string.
+ * @param H - The hex color string (e.g., "#fff" or "#ffffff").
+ * @returns The HSL color string.
+ */
 export function hexToHSL(H: string) {
   // Convert hex to RGB first
   let r: number = 0
@@ -68,6 +86,9 @@ export function hexToHSL(H: string) {
   return 'hsl(' + h + ',' + s + '%,' + l + '%)'
 }
 
+/**
+ * Label definitions for use case status categories, including legend text and color.
+ */
 export const LABELS = {
   accepted: { legend: 'Accepted', color: '#6a9a23' },
   included: { legend: 'Included in PRD', color: '#dcdfe4' },
@@ -76,6 +97,13 @@ export const LABELS = {
   unprocessed: { legend: 'Unprocessed', color: '#7d818a' },
 }
 
+/**
+ * Sorts an array of graph data objects by a given facet and direction.
+ * @param rawData - The array of data objects to sort.
+ * @param facet - The key to sort by.
+ * @param direction - 'asc' for ascending, 'desc' for descending.
+ * @returns The sorted array of data objects.
+ */
 export const sortGraphData = (
   rawData: Record<string, string | number>[],
   facet: string,
