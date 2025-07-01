@@ -84,8 +84,8 @@ Each analytics route fetches and processes data dynamically, displaying both a s
 Visit http://localhost:3000 to view the app.
 
 ## Project Structure
-  `app/` — Next.js app directory (routing, pages, layouts, API routes)
-  `components/` — Reusable UI components (e.g., Header)
-  `lib/` — Utility functions and data fetching logic
-  `public/` — Static assets
-  `types/` — TypeScript type definitions
+    `app/` — Next.js app directory (routing, pages, layouts, API routes)
+    `components/` — Reusable UI components (e.g., Header)
+    `lib/` — Utility functions and data fetching logic
+    `public/` — Static assets
+    `types/` — TypeScript type definitions
