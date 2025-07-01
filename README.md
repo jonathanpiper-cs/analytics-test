@@ -62,23 +62,23 @@ Each analytics route fetches and processes data dynamically, displaying both a s
 ## Getting Started
 
 1. **Install dependencies:**
-   `bash
+   ```bash
    pnpm install
    # or
    npm install
    # or
    yarn install
    # or
-   bun install`
+   bun install```
 
 2. **Run the development server:**
-    `pnpm dev
+    ```pnpm dev
     # or
     npm run dev
     # or
     yarn dev
     # or
-    bun dev`
+    bun dev```
 
 3. **Open your browser:**
 Visit http://localhost:3000 to view the app.
