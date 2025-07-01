@@ -106,8 +106,8 @@ export function groupAndAnalyzeUseCasesByFacet(
 
     return {
       [getFacetIndex(facet)]: facetValue, // The facet value (e.g., author name)
-      cases,                              // All use cases for this facet value
-      total: cases.length,                // Total number of use cases in this group
+      cases, // All use cases for this facet value
+      total: cases.length, // Total number of use cases in this group
       byCategory: {
         total: cases.length,
         unprocessed: Math.max(
